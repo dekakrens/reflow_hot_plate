@@ -1,5 +1,6 @@
 #include <Thermistor.h> 
 #include <NTC_Thermistor.h>
+#include <SmoothThermistor.h>
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 
@@ -8,9 +9,10 @@
 #define NOMINAL_RESISTANCE  87900
 #define NOMINAL_TEMPERATURE 26.5
 #define B_VALUE             3950
+#define SMOOTHING_FACTOR    5
 
 // Instance
-Thermistor* thermistor;
+Thermistor* thermistor = NULL;
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 // IO
@@ -60,13 +62,14 @@ void setup() {
   pinMode(but_3, INPUT_PULLUP);
   pinMode(but_4, INPUT_PULLUP);
 
-  thermistor = new NTC_Thermistor(
+  Thermistor* originThermistor = new NTC_Thermistor(
     SENSOR_PIN,
     REF_RESISTANCE,
     NOMINAL_RESISTANCE,
     NOMINAL_TEMPERATURE,
     B_VALUE
   );
+  thermistor = new SmoothThermistor(originThermistor, SMOOTHING_FACTOR);
 
   lcd.init();
   lcd.setBacklight(HIGH);
